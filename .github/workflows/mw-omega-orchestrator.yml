@@ -1,0 +1,63 @@
+﻿name: MW-Ω Orchestrator
+
+on:
+  schedule:
+    - cron: '0 14 * * 1'
+    - cron: '0 15 1 * *'
+    - cron: '0 15 1 3,6,9,12 *'
+  workflow_dispatch:
+    inputs:
+      command:
+        description: 'Command to run'
+        required: true
+        default: 'weekly'
+        type: choice
+        options:
+          - weekly
+          - monthly
+          - quarterly
+          - absence
+
+jobs:
+  orchestrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Create output directory
+        run: mkdir -p reports
+      - name: Determine command
+        id: command
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "cmd=${{ github.event.inputs.command }}" >> $GITHUB_OUTPUT
+          else
+            DAY_OF_MONTH=$(date -u +%d)
+            MONTH=$(date -u +%m)
+            DAY_OF_WEEK=$(date -u +%u)
+            if [ "$DAY_OF_MONTH" = "01" ] && echo "3 6 9 12" | grep -qw "$MONTH"; then
+              echo "cmd=quarterly" >> $GITHUB_OUTPUT
+            elif [ "$DAY_OF_MONTH" = "01" ]; then
+              echo "cmd=monthly" >> $GITHUB_OUTPUT
+            else
+              echo "cmd=weekly" >> $GITHUB_OUTPUT
+            fi
+          fi
+      - name: Run MW-Ω Orchestrator
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          MW_OUTPUT_DIR: ./reports
+        run: python mw_orchestrator.py ${{ steps.command.outputs.cmd }}
+      - name: Commit reports
+        run: |
+          git config user.name "MW-Ω Orchestrator"
+          git config user.email "mw-omega@automated.system"
+          git add reports/
+          git diff --staged --quiet || git commit -m "MW-Ω: ${{ steps.command.outputs.cmd }} report $(date -u +%Y-%m-%d)"
+          git push
