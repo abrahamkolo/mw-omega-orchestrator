@@ -4,19 +4,23 @@ MW-Ω Autonomous Orchestrator
 Converts Claude from reactive to proactive by self-executing on schedule.
 
 Commands:
-  weekly     - Monday morning briefing: stop rules, queue, energy check
-  monthly    - 1st of month: metrics snapshot, concentration check
-  quarterly  - Competitive scan, regulatory monitor, vendor health
-  absence    - Founder absence simulation test
-  decision   - Tier-1 Red/Blue team analysis (requires context arg)
-  montecarlo - Monte Carlo survival simulation (1000 scenarios, 7 revenue streams)
-  depgraph   - Vendor dependency graph with SPOF centrality scores
+  weekly      - Monday morning briefing: stop rules, queue, energy check
+  monthly     - 1st of month: metrics snapshot, concentration check
+  quarterly   - Competitive scan, regulatory monitor, vendor health
+  absence     - Founder absence simulation test
+  decision    - Tier-1 Red/Blue team analysis (requires context arg)
+  montecarlo  - Monte Carlo survival simulation (1000 scenarios, 7 revenue streams)
+  depgraph    - Vendor dependency graph with SPOF centrality scores
+  healthcheck - API key + system health check (bi-monthly)
+  ingest      - Parse revenue CSVs into consolidated data
 
 Usage:
   python mw_orchestrator.py weekly
   python mw_orchestrator.py decision "Should I invest $15K in workforce multifamily?"
   python mw_orchestrator.py montecarlo
   python mw_orchestrator.py depgraph
+  python mw_orchestrator.py healthcheck
+  python mw_orchestrator.py ingest
 """
 
 import os
@@ -141,6 +145,14 @@ Compare to baseline of 12.4/100.
 Recommend top 3 delegation priorities to improve score fastest.
 
 Be brutally honest. The point is to find what breaks.""",
+
+    "healthcheck": """Run MW-Ω Health Check:
+1. Confirm this API call succeeded (if you're reading this, it did)
+2. Report: API key status = VALID
+3. Check: Are we within 14 days of any known credential expiry?
+4. List all scheduled commands and their last run dates from the reports/ folder
+5. Output a health status: GREEN (all good), YELLOW (expiry approaching), RED (something broken)
+Format as a markdown report.""",
 }
 
 
@@ -754,9 +766,11 @@ def main():
         "monthly": ("1st of month metrics", lambda: run_command("monthly")),
         "quarterly": ("Competitive + regulatory scan", lambda: run_command("quarterly")),
         "absence": ("Founder absence simulation", lambda: run_command("absence")),
+        "healthcheck": ("API key + system health check", lambda: run_command("healthcheck")),
         "decision": ("Tier-1 Red/Blue analysis", None),  # handled separately
         "montecarlo": ("Monte Carlo survival simulation", None),  # handled separately
         "depgraph": ("Vendor dependency graph + SPOF scores", None),  # handled separately
+        "ingest": ("Parse revenue data from CSVs", None),  # handled separately
     }
 
     if len(sys.argv) < 2 or sys.argv[1] not in commands:
