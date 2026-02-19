@@ -96,6 +96,21 @@ python mw_orchestrator.py decision "Should I invest $15K in workforce multifamil
 
 ---
 
+## Notion Sync (Optional)
+
+To sync reports to your Notion MW-Ω Command Center:
+
+1. Go to your repo on GitHub: `github.com/abrahamkolo/mw-omega-orchestrator`
+2. Click **Settings** → **Secrets and variables** → **Actions**
+3. Add two secrets:
+   - `NOTION_API_KEY` — Your MW-Omega-Orchestrator Notion integration token
+   - `NOTION_DASHBOARD_ID` — The Dashboard page ID (e.g., `3096588a-4b95-81cd-8ee3-eb355a597f92`)
+
+Reports will automatically sync to Notion after each successful scheduled run.
+If these secrets are not set, the sync step silently skips.
+
+---
+
 ## Troubleshooting
 
 **"Error: ANTHROPIC_API_KEY not set"**

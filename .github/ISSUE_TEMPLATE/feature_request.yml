@@ -1,0 +1,50 @@
+name: "MW-Ω Feature Request"
+description: Request a new feature or enhancement for the MW-Ω Orchestrator
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: dropdown
+    id: command
+    attributes:
+      label: Command Affected
+      description: Which orchestrator command does this relate to?
+      options:
+        - weekly
+        - monthly
+        - quarterly
+        - absence
+        - montecarlo
+        - depgraph
+        - decision
+        - healthcheck
+        - ingest
+        - new command
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the feature you'd like added or changed.
+      placeholder: "I want the orchestrator to..."
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: MW-Ω Impact
+      description: Which stop rule or queue item is affected? How does this improve the system?
+      placeholder: "This addresses the concentration cap by..."
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - P0 — System down / Critical
+        - P1 — High impact, needs this week
+        - P2 — Medium, next sprint
+        - P3 — Nice to have
+    validations:
+      required: true
