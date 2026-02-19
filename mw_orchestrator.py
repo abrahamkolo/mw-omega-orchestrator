@@ -46,6 +46,8 @@ except ImportError:
 MODEL_ROUTINE = "claude-sonnet-4-5-20250929"  # $0.15/run for routine ops
 MODEL_TIER1 = "claude-opus-4-6"               # $1.50/run for Tier-1 decisions
 OUTPUT_DIR = Path(os.environ.get("MW_OUTPUT_DIR", "./reports"))
+DATA_DIR = Path("data")
+REVENUE_SUMMARY_FILE = DATA_DIR / "revenue_summary.json"
 
 # --- MW-Ω System Prompt ---
 MW_SYSTEM_PROMPT = """You are MW-Ω, Abraham J. Kolo's autonomous operational system.
@@ -257,9 +259,55 @@ VENDOR_DEPENDENCIES = {
 }
 
 
+# --- Data Source Tracking ---
+MW_DATA_SOURCE = "placeholder"  # "placeholder" or "live"
+
+
+def load_live_revenue_data():
+    """Load real revenue data if available, updating REVENUE_STREAMS with live figures."""
+    global MW_DATA_SOURCE
+    if not REVENUE_SUMMARY_FILE.exists():
+        print("MW-Ω: No live revenue data found. Using placeholder estimates.")
+        return
+
+    try:
+        summary = json.loads(REVENUE_SUMMARY_FILE.read_text())
+        if summary.get("data_source") == "no_data":
+            print("MW-Ω: Revenue summary exists but contains no data. Using placeholders.")
+            return
+
+        # Map live data back to REVENUE_STREAMS
+        stream_map = {
+            "kdp_books": "kdp_books",
+            "substack_newsletter": "substack_newsletter",
+            "consulting": "consulting",
+            "government_contract": "government_contract",
+            "music_production": "music_production",
+            "real_estate": "real_estate",
+            "framework_licensing": "framework_licensing",
+        }
+        by_stream = summary.get("by_stream", {})
+        concentration = summary.get("concentration", {})
+
+        for live_key, stream_key in stream_map.items():
+            if live_key in by_stream and stream_key in REVENUE_STREAMS:
+                live_amount = by_stream[live_key]
+                if live_amount > 0:
+                    REVENUE_STREAMS[stream_key]["monthly_base"] = live_amount
+                    REVENUE_STREAMS[stream_key]["probability_active"] = 0.90
+            if live_key in concentration and stream_key in REVENUE_STREAMS:
+                REVENUE_STREAMS[stream_key]["concentration_current"] = concentration[live_key]
+
+        MW_DATA_SOURCE = "live"
+        print(f"MW-Ω: Loaded live revenue data ({len(by_stream)} streams, ${summary['total_revenue']:,.2f} total)")
+    except (json.JSONDecodeError, KeyError) as e:
+        print(f"MW-Ω: Error loading revenue data: {e}. Using placeholders.")
+
+
 # --- Monte Carlo Simulation Engine ---
 def run_monte_carlo():
     """Run 1000-scenario Monte Carlo survival simulation across 7 revenue streams."""
+    load_live_revenue_data()  # Try to load real data before simulating
     random.seed(42)  # Reproducible results
     results = []
 
@@ -364,6 +412,7 @@ def _format_monte_carlo_report(results: list) -> str:
 - **Scenarios**: {SIMULATION_SCENARIOS:,}
 - **Time horizon**: {SIMULATION_MONTHS} months
 - **Revenue streams**: {len(REVENUE_STREAMS)}
+- **Data source**: {MW_DATA_SOURCE}
 - **Starting cash**: ~$0 (current operating position)
 - **Monthly expenses**: ~$5,500 +/- $500
 - **Seed**: 42 (reproducible)
@@ -802,6 +851,18 @@ def main():
         report_content = run_dependency_graph()
         save_report("depgraph", report_content)
         print("MW-Ω: Dependency graph analysis complete.")
+    elif cmd == "ingest":
+        print("MW-Ω: Running revenue data ingestion...")
+        import subprocess
+        result = subprocess.run(
+            [sys.executable, "scripts/parse_revenue.py"],
+            capture_output=True, text=True
+        )
+        print(result.stdout)
+        if result.returncode != 0:
+            print(f"Error: {result.stderr}")
+            sys.exit(1)
+        print("MW-Ω: Revenue data ingestion complete.")
     else:
         _, func = commands[cmd]
         func()
