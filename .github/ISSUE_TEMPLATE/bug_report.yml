@@ -1,0 +1,54 @@
+name: "MW-Ω Bug Report"
+description: Report a bug or unexpected behavior in the MW-Ω Orchestrator
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: command
+    attributes:
+      label: Command Affected
+      description: Which orchestrator command had the issue?
+      options:
+        - weekly
+        - monthly
+        - quarterly
+        - absence
+        - montecarlo
+        - depgraph
+        - decision
+        - healthcheck
+        - ingest
+        - workflow / GitHub Actions
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+    validations:
+      required: true
+  - type: textarea
+    id: error_log
+    attributes:
+      label: Error Log
+      description: Paste any relevant error output or GitHub Actions log.
+      render: shell
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - Orchestrator down — no reports generating
+        - Wrong output — reports generate but content is incorrect
+        - Cosmetic — formatting or minor display issue
+    validations:
+      required: true
