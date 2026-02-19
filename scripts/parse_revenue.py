@@ -141,7 +141,7 @@ def build_summary(revenues):
 
 
 def main():
-    print("MW-Ω Revenue Data Ingestion")
+    print("MW-Omega Revenue Data Ingestion")
     print("=" * 40)
 
     if not DATA_DIR.exists():

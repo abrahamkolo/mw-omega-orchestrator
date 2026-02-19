@@ -1,0 +1,20 @@
+{
+  "total_revenue": 0.0,
+  "by_stream": {
+    "kdp_books": 0.0
+  },
+  "concentration": {},
+  "liquidity_estimate": 0.0,
+  "data_source": "live",
+  "parsed_at": "2026-02-19T16:11:00.398759Z",
+  "files_parsed": [
+    "kdp_royalties.csv"
+  ],
+  "files_missing": [
+    "substack_earnings.csv",
+    "suno_revenue.csv",
+    "spotify_royalties.csv",
+    "spring_sales.csv"
+  ],
+  "record_count": 12
+}
