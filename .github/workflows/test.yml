@@ -4,12 +4,17 @@ on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.9', '3.11', '3.12']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: pip install pytest pytest-cov
       - name: Run demo
-        run: python3 demo/run_demo.py
+        run: python demo/run_demo.py
       - name: Run tests
-        run: python3 -m pytest tests/ -v --tb=short || echo "No tests yet -- demo verified"
+        run: pytest tests/ -v --tb=short --cov=demo --cov-report=term-missing
