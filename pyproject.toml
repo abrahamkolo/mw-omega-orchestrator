@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "mw-omega-orchestrator"
+version = "0.1.0"
+description = "Deterministic orchestration engine — dependency graphs, Monte Carlo simulation, decision compression for institutional governance stacks."
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+authors = [
+    {name = "Reliance Infrastructure Holdings LLC", email = "abrahamkolo@gmail.com"}
+]
+keywords = ["orchestration", "governance", "monte-carlo", "decision-engine", "deterministic"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pytest-cov>=4.0"]
+ai = ["anthropic>=0.18.0"]
+
+[project.urls]
+Homepage = "https://github.com/abrahamkolo/mw-omega-orchestrator"
+Documentation = "https://github.com/abrahamkolo/mw-omega-orchestrator/blob/main/README.md"
+Repository = "https://github.com/abrahamkolo/mw-omega-orchestrator"
+Issues = "https://github.com/abrahamkolo/mw-omega-orchestrator/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
